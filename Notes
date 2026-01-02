@@ -1,0 +1,33 @@
+===========================
+GitHub repos
+===========================
+------------------------------------------------------------------------------------------------------------------------
+Section Name                                                    Repo URL
+------------------------------------------------------------------------------------------------------------------------
+Working with AI Models in Spring                                https://github.com/shabbirdwd53/spring-ai
+Spring AI with DALL-E and Audio Models (MultiModality)          https://github.com/shabbirdwd53/spring-ai
+Retrieval-Augmented Generation (RAG) with Spring AI             https://github.com/shabbirdwd53/spring-ai
+Building AI-driven Application                                  https://github.com/shabbirdwd53/sentiment-analysis
+
+Refer the pdf file for the URL links
+
+===========================
+Roles in Prompts for API
+===========================
+
+1. User role
+2. System role
+
+{
+  "model": "gpt-4o",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant"
+    },
+    {
+      "role": "user",
+      "content": "Hello!"
+    }
+  ]
+}
