@@ -230,3 +230,66 @@ DOCUMENTS:
 2026-01-03T01:52:35.599+05:30 DEBUG 25234 --- [spring-ai] [nio-8080-exec-3] m.m.a.RequestResponseBodyMethodProcessor : Using 'text/html', given [text/html, application/xhtml+xml, image/avif, image/webp, image/apng, application/xml;q=0.9, */*;q=0.8] and supported [text/plain, */*, application/json, application/*+json, application/yaml]
 2026-01-03T01:52:35.600+05:30 DEBUG 25234 --- [spring-ai] [nio-8080-exec-3] m.m.a.RequestResponseBodyMethodProcessor : Writing ["Child labour is defined and regulated by various laws in India. The Child Labour (Prohibition and Re (truncated)..."]
 2026-01-03T01:52:35.602+05:30 DEBUG 25234 --- [spring-ai] [nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+
+
+==============================
+OPENAI calls in the project:
+==============================
+
+⏺ Great question! Let me trace the OpenAI API calls in your project. There are two main places where OpenAI is called:
+
+  1. Embedding Generation (for vector similarity search)
+
+  When documents are loaded into the vector store, OpenAI is called to generate embeddings:
+
+⏺ Read(src/main/java/com/paathshala/spring_ai/config/PGVectorLoader.java)
+  ⎿  Read 10 lines (ctrl+o to expand)
+
+⏺ Read(src/main/java/com/paathshala/spring_ai/config/VectorStoreConfig.java)
+  ⎿  Read 17 lines (ctrl+o to expand)
+
+⏺ OpenAI API Calls Flow:
+
+  🔹 Call 1: Embedding Generation (Document Loading)
+
+  Where: PGVectorLoader.init() → vectorStore.accept()When: During application startup (when loading documents)Purpose: Convert PDF text chunks into vector embeddingsAPI:
+  text-embedding-ada-002 (OpenAI's embedding model)
+
+  // In PGVectorLoader.java line 51
+  vectorStore.accept(textSplitter.apply(reader.get()));
+  // This calls OpenAI to generate embeddings for each document chunk
+
+  🔹 Call 2: Embedding Generation (Query Time)
+
+  Where: ICSController.findSimilarData() → vectorStore.similaritySearch()When: Every time you call /ic endpointPurpose: Convert user query into embeddings to find similar
+   documentsAPI: text-embedding-ada-002
+
+  // In ICSController.java line 89
+  List<Document> documents = vectorStore.similaritySearch(...)
+  // This calls OpenAI to generate embeddings for the user's question
+
+  🔹 Call 3: Chat Completion (Final Response)
+
+   Where: ICSController → chatClient.prompt().call()When: Every time you call /ics or /ic endpointsPurpose: Generate final response using retrieved contextAPI:
+   gpt-3.5-turbo (as configured in application.properties)
+
+   // In ICSController.java line 70-73
+   return chatClient
+       .prompt(template.create(promptParams))
+       .call()
+       .content();
+   // This calls OpenAI GPT-3.5-turbo with the enhanced prompt
+
+   Configuration:
+
+   Your OpenAI configuration in application.properties:
+   spring.ai.openai.api-key=${OPENAI_API_KEY}
+   spring.ai.openai.chat.options.model=gpt-3.5-turbo
+
+   Summary of OpenAI Usage:
+
+   1. Startup: 1 embedding call per document chunk (one-time cost)
+   2. Per /ic request: 1 embedding call + 1 chat completion call
+   3. Per /ics request: Only 1 chat completion call (no embeddings)
+
+   The EmbeddingModel bean is automatically configured by Spring AI to use OpenAI's embedding service based on your API key!
