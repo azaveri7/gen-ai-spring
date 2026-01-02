@@ -252,7 +252,9 @@ OPENAI calls in the project:
 
   🔹 Call 1: Embedding Generation (Document Loading)
 
-  Where: PGVectorLoader.init() → vectorStore.accept()When: During application startup (when loading documents)Purpose: Convert PDF text chunks into vector embeddingsAPI:
+  Where: PGVectorLoader.init() → vectorStore.accept()When: During application startup (when loading documents)Purpose:
+  Convert PDF text chunks into vector embeddingsAPI:
+
   text-embedding-ada-002 (OpenAI's embedding model)
 
   // In PGVectorLoader.java line 51
@@ -261,7 +263,9 @@ OPENAI calls in the project:
 
   🔹 Call 2: Embedding Generation (Query Time)
 
-  Where: ICSController.findSimilarData() → vectorStore.similaritySearch()When: Every time you call /ic endpointPurpose: Convert user query into embeddings to find similar
+  Where: ICSController.findSimilarData() → vectorStore.similaritySearch()When: Every time you call /ic endpointPurpose:
+  Convert user query into embeddings to find similar
+
    documentsAPI: text-embedding-ada-002
 
   // In ICSController.java line 89
@@ -270,7 +274,9 @@ OPENAI calls in the project:
 
   🔹 Call 3: Chat Completion (Final Response)
 
-   Where: ICSController → chatClient.prompt().call()When: Every time you call /ics or /ic endpointsPurpose: Generate final response using retrieved contextAPI:
+   Where: ICSController → chatClient.prompt().call()When: Every time you call /ics or /ic endpointsPurpose:
+   Generate final response using retrieved contextAPI:
+
    gpt-3.5-turbo (as configured in application.properties)
 
    // In ICSController.java line 70-73
@@ -292,4 +298,5 @@ OPENAI calls in the project:
    2. Per /ic request: 1 embedding call + 1 chat completion call
    3. Per /ics request: Only 1 chat completion call (no embeddings)
 
-   The EmbeddingModel bean is automatically configured by Spring AI to use OpenAI's embedding service based on your API key!
+   The EmbeddingModel bean is automatically configured by Spring AI to use OpenAI's
+   embedding service based on your API key!
